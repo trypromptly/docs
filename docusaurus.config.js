@@ -79,6 +79,7 @@ const config = {
         logo: {
           alt: "Promptly Logo",
           src: "img/logo.svg",
+          href: "https://trypromptly.com",
         },
         items: [
           {
