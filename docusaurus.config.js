@@ -9,7 +9,7 @@ const darkCodeTheme = themes.dracula;
 const config = {
   title: "Promptly",
   tagline: "AI Agents in Minutes | No-code AI App Builder",
-  favicon: "img/llmstack-icon.png",
+  favicon: "img/promptly-icon.png",
 
   // Set the production url of your site here
   url: "https://docs.trypromptly.com",
