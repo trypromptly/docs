@@ -5,53 +5,54 @@ title: Implement External Datasource
 
 LLMStack supports adding an external datastore as a read-only datasource. Adding an external datastore gives you the ability to query the datastore and use the results in your LLM applications.
 
-Adding an external datasource is easy. Add a new module in `llmstack/datasources/handlers/databases/` add your implmentation as `<datasource-name>.py`. You can check out the `Postgres Datasource` [implementation](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/postgres.py)
+Adding an external datasource is easy. You can check out the `Postgres Datasource` [implementation](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/sql.py)
 
-```bash
-cd llmstack/datasources/handlers/databases
-touch <datasource-name>.py
-```
 
 ### Define Database Handler Connection Schema
 
-You start by defining the database connection schema. You can define the schemas in the `<datasource-name>.py` file. We use pydatic for schema definitions. So make sure your schema definition class inherits from `llmstack.datasources.handlers.datasource_processor import DataSourceSchema`.
+You start by defining the database connection schema. You can define the schemas in the `sql.py` file. We use pydatic for schema definitions. So make sure your schema definition class inherits from `llmstack.datasources.handlers.datasource_processor import DataSourceSchema`.
 
 In case of our example Postgres Implementation, we define the connection schema as follows:
 
 ```python
 from llmstack.common.blocks.base.schema import BaseSchema
-class PostgresConnection(BaseSchema):
-    host: str = Field(description='Host of the Postgres instance')
+from llmstack.datasources.handlers.datasource_processor import DataSourceSchema
+
+
+class PostgreSQLConnection(BaseSchema):
+    engine: Literal[DatabaseEngineType.POSTGRESQL] = DatabaseEngineType.POSTGRESQL
+    host: str = Field(description="Host of the PostgreSQL instance")
     port: int = Field(
-        description='Port number to connect to the Postgres instance')
-    database_name: str = Field(description='Postgres database name')
-    username: str = Field(description='Postgres username')
-    password: Optional[str] = Field(description='Postgres password')
+        description="Port number to connect to the PostgreSQL instance",
+    )
+    database_name: str = Field(description="PostgreSQL database name")
+
+    class Config:
+        title = "PostgreSQL"
 
 
-class PostgresDatabaseSchema(DataSourceSchema):
-    connection: Optional[PostgresConnection] = Field(
-        description='Postgres connection details')
+SQLConnection = Union[PostgreSQLConnection]
+
+
+class SQLDatabaseSchema(DataSourceSchema):
+    connection: Optional[SQLConnection] = Field(
+        title="Database",
+        # description="Database details",
+    )
+    connection_id: Optional[str] = Field(
+        widget="connection",
+        advanced_parameter=False,
+        description="Use your authenticated connection to the database",
+        # Filters is a list of strings, each formed by the combination of the connection attributes 'base_connection_type', 'provider_slug', and 'connection_type_slug', separated by '/'.
+        # The pattern followed is: base_connection_type/provider_slug/connection_type_slug. We may skip provider_slug or connection_type_slug if they are not present in the filter string.
+        filters=[ConnectionType.CREDENTIALS + "/basic_authentication"],
+    )
 ```
 
 The above schema will be used to render the UI for the user to enter the connection details.
 ![Postgres Connection Schema](/img/external-datasource-config.png)
 
-**LLMStack** framework takes care of storing the connection details in the database in an encrypted format or as plain text. To define this behavior you will also need to define a `ConnectionConfiguration` class. This class will inherit from `from llmstack.common.utils.models import Config`.
-e.g
-
-```python
-class PostgresConnectionConfiguration(Config):
-    config_type = 'postgres_connection'
-    is_encrypted = True
-    postgres_config: Optional[Dict]
-```
-
-The database connection details will be stored in the `postgres_config` key and will be encrypted if `is_encrypted` is set to `True`.
-
-:::note
-Defining this class is mandatory regardless of whether you want to store the connection details as encrypted or not.
-:::
+**LLMStack** framework takes care of storing the connection details in the database in an encrypted format or as plain text. 
 
 ### Define Database Handler Implementation
 
