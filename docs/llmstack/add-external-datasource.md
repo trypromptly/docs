@@ -3,19 +3,19 @@ id: add-external-datasource
 title: Implement External Datasource
 ---
 
-`LLMStack` supports adding an external datastore as a read-only datasource. Adding an external datastore gives you the ability to query the datastore and use the results in your LLM applications. `LLMStack` uses [`SQLAlchemy`](https://www.sqlalchemy.org/) and currently implements `MySQL`, `Postgresql` and `SQLite` [dialects](https://docs.sqlalchemy.org/en/20/dialects/).
+`LLMStack` supports adding an external datastore as a read-only datasource. Adding an external datastore enables you to query the datastore and use the results in your LLM applications. `LLMStack` utilizes [`SQLAlchemy`](https://www.sqlalchemy.org/) and currently supports `MySQL`, `PostgreSQL`, and `SQLite` [dialects](https://docs.sqlalchemy.org/en/20/dialects/).
 
-Adding any other SQLAlchemy supported database dialect as an external datasource is easy. You can check out the implementation for  `PostgreSQLConnection`, `SQLConnection` and `SQLDatabaseSchema` [implementation](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/sql.py#L31)
-
+Adding any other SQLAlchemy-supported database dialect as an external datasource is straightforward. You can check out the implementations for `PostgreSQLConnection`, `MySQLConnection`, and `SQLDatabaseSchema` [here](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/sql.py#L31).
 
 ### Define Database Handler Connection Schema
 
-You start by defining the database connection schema. You can define the schemas in the `sql.py` file. We use pydatic for schema definitions. So make sure your schema definition class inherits from `llmstack.datasources.handlers.datasource_processor import DataSourceSchema`.
+Begin by defining the database connection schema. Define the schemas in the `sql.py` file using Pydantic for schema definitions. Ensure your schema definition class inherits from `DataSourceSchema` found in `llmstack.datasources.handlers.datasource_processor`.
 
-In case of our example Postgres Implementation, we define the connection schema and add it to `SQLConnection` union as follows:
+In our example PostgreSQL implementation, we define the connection schema and add it to the `SQLConnection` union as follows:
 
 ```python
 from llmstack.common.blocks.base.schema import BaseSchema as _Schema
+from llmstack.common.blocks.data.store.database.constants import DatabaseEngineType
 from llmstack.datasources.handlers.datasource_processor import DataSourceSchema
 
 
@@ -72,10 +72,10 @@ class SQLDatabaseSchema(DataSourceSchema):
 The above schema will be used to render the UI for the user to enter the connection details.
 ![Postgres Connection Schema](/img/external-datasource-config.png)
 
-**LLMStack** framework takes care of storing the connection details in the database in an encrypted format or as plain text. To define this behavior you will also need to define a `ConnectionConfiguration` class. This class will inherit from `from llmstack.common.utils.models import Config`.
-e.g
+**LLMStack** framework ensures the connection details are securely stored in the database, either in an encrypted format or as plain text, depending on your configuration. To define this behavior, you also need to define a `ConnectionConfiguration` class, which will inherit from `Config` in `llmstack.common.utils.models`.
 
 ```python
+from typing import Optional, Dict
 from llmstack.common.utils.models import Config
 
 class SQLConnectionConfiguration(Config):
@@ -84,11 +84,21 @@ class SQLConnectionConfiguration(Config):
     config: Optional[Dict]
 ```
 
-The database connection details will be stored in the `config` key and will be encrypted if `is_encrypted` is set to `True`.
+The database connection details will be stored under the `config` key and will be encrypted if `is_encrypted` is set to `True`.
 
 ### Define Database Handler Implementation
 
-Once we have the schemas defined, we can start with the database handler implementation. Each database handler implmentation should inherit from `llmstack.datasources.handlers.datasource_processor.DataSourceProcessor`. Each implementation needs to implement the following methods:
+Once the schemas are defined, you can start using the `SQLDataSource` database handler implementation. As outlined below, it extends from `DataSourceProcessor`.
+
+```python
+from llmstack.datasources.handlers.datasource_processor import DataSourceProcessor
+
+class SQLDataSource(DataSourceProcessor[SQLDatabaseSchema]):
+    # Implementations follow
+```
+
+Like `SQLDataSource`, every `DataSourceProcessor` implementation must implement the following methods:
+
 
 #### `def __init__(datasource: DataSource))` :
 
