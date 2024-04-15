@@ -3,59 +3,102 @@ id: add-external-datasource
 title: Implement External Datasource
 ---
 
-LLMStack supports adding an external datastore as a read-only datasource. Adding an external datastore gives you the ability to query the datastore and use the results in your LLM applications.
+`LLMStack` supports adding an external datastore as a read-only datasource. Adding an external datastore enables you to query the datastore and use the results in your LLM applications. `LLMStack` utilizes [`SQLAlchemy`](https://www.sqlalchemy.org/) and currently supports `MySQL`, `PostgreSQL`, and `SQLite` [dialects](https://docs.sqlalchemy.org/en/20/dialects/).
 
-Adding an external datasource is easy. Add a new module in `llmstack/datasources/handlers/databases/` add your implmentation as `<datasource-name>.py`. You can check out the `Postgres Datasource` [implementation](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/postgres.py)
-
-```bash
-cd llmstack/datasources/handlers/databases
-touch <datasource-name>.py
-```
+Adding any other SQLAlchemy-supported database dialect as an external datasource is straightforward. You can check out the implementations for `PostgreSQLConnection`, `MySQLConnection`, and `SQLDatabaseSchema` [here](https://github.com/trypromptly/LLMStack/blob/main/llmstack/datasources/handlers/databases/sql.py#L31).
 
 ### Define Database Handler Connection Schema
 
-You start by defining the database connection schema. You can define the schemas in the `<datasource-name>.py` file. We use pydatic for schema definitions. So make sure your schema definition class inherits from `llmstack.datasources.handlers.datasource_processor import DataSourceSchema`.
+Begin by defining the database connection schema. Define the schemas in the `sql.py` file using Pydantic for schema definitions. Ensure your schema definition class inherits from `DataSourceSchema` found in `llmstack.datasources.handlers.datasource_processor`.
 
-In case of our example Postgres Implementation, we define the connection schema as follows:
+In our example PostgreSQL implementation, we define the connection schema and add it to the `SQLConnection` union as follows:
 
 ```python
-from llmstack.common.blocks.base.schema import BaseSchema
-class PostgresConnection(BaseSchema):
-    host: str = Field(description='Host of the Postgres instance')
+from llmstack.common.blocks.base.schema import BaseSchema as _Schema
+from llmstack.common.blocks.data.store.database.constants import DatabaseEngineType
+from llmstack.datasources.handlers.datasource_processor import DataSourceSchema
+
+
+class PostgreSQLConnection(_Schema):
+    engine: Literal[DatabaseEngineType.POSTGRESQL] = DatabaseEngineType.POSTGRESQL
+    host: str = Field(description="Host of the PostgreSQL instance")
     port: int = Field(
-        description='Port number to connect to the Postgres instance')
-    database_name: str = Field(description='Postgres database name')
-    username: str = Field(description='Postgres username')
-    password: Optional[str] = Field(description='Postgres password')
+        description="Port number to connect to the PostgreSQL instance",
+    )
+    database_name: str = Field(description="PostgreSQL database name")
+
+    class Config:
+        title = "PostgreSQL"
 
 
-class PostgresDatabaseSchema(DataSourceSchema):
-    connection: Optional[PostgresConnection] = Field(
-        description='Postgres connection details')
+class MySQLConnection(_Schema):
+    engine: Literal[DatabaseEngineType.MYSQL] = DatabaseEngineType.MYSQL
+    host: str = Field(description="Host of the MySQL instance")
+    port: int = Field(
+        description="Port number to connect to the MySQL instance",
+    )
+    database_name: str = Field(description="MySQL database name")
+
+    class Config:
+        title = "MySQL"
+
+
+class SQLiteConnection(_Schema):
+    engine: Literal[DatabaseEngineType.SQLITE] = DatabaseEngineType.SQLITE
+    database_path: str = Field(description="SQLite database file path")
+
+    class Config:
+        title = "SQLite"        
+
+
+SQLConnection = Union[PostgreSQLConnection, MySQLConnection, SQLiteConnection]
+
+
+class SQLDatabaseSchema(DataSourceSchema):
+    connection: Optional[SQLConnection] = Field(
+        title="Database",
+        # description="Database details",
+    )
+    connection_id: Optional[str] = Field(
+        widget="connection",
+        advanced_parameter=False,
+        description="Use your authenticated connection to the database",
+        # Filters is a list of strings, each formed by the combination of the connection attributes 'base_connection_type', 'provider_slug', and 'connection_type_slug', separated by '/'.
+        # The pattern followed is: base_connection_type/provider_slug/connection_type_slug. We may skip provider_slug or connection_type_slug if they are not present in the filter string.
+        filters=[ConnectionType.CREDENTIALS + "/basic_authentication"],
+    )
 ```
 
 The above schema will be used to render the UI for the user to enter the connection details.
 ![Postgres Connection Schema](/img/external-datasource-config.png)
 
-**LLMStack** framework takes care of storing the connection details in the database in an encrypted format or as plain text. To define this behavior you will also need to define a `ConnectionConfiguration` class. This class will inherit from `from llmstack.common.utils.models import Config`.
-e.g
+**LLMStack** framework ensures the connection details are securely stored in the database, either in an encrypted format or as plain text, depending on your configuration. To define this behavior, you also need to define a `ConnectionConfiguration` class, which will inherit from `Config` in `llmstack.common.utils.models`.
 
 ```python
-class PostgresConnectionConfiguration(Config):
-    config_type = 'postgres_connection'
+from typing import Optional, Dict
+from llmstack.common.utils.models import Config
+
+class SQLConnectionConfiguration(Config):
+    config_type: Optional[str] = "sql_connection"
     is_encrypted = True
-    postgres_config: Optional[Dict]
+    config: Optional[Dict]
 ```
 
-The database connection details will be stored in the `postgres_config` key and will be encrypted if `is_encrypted` is set to `True`.
-
-:::note
-Defining this class is mandatory regardless of whether you want to store the connection details as encrypted or not.
-:::
+The database connection details will be stored under the `config` key and will be encrypted if `is_encrypted` is set to `True`.
 
 ### Define Database Handler Implementation
 
-Once we have the schemas defined, we can start with the database handler implementation. Each database handler implmentation should inherit from `llmstack.datasources.handlers.datasource_processor.DataSourceProcessor`. Each implementation needs to implement the following methods:
+Once the schemas are defined, you can start using the `SQLDataSource` database handler implementation. As outlined below, it extends from `DataSourceProcessor`.
+
+```python
+from llmstack.datasources.handlers.datasource_processor import DataSourceProcessor
+
+class SQLDataSource(DataSourceProcessor[SQLDatabaseSchema]):
+    # Implementations follow
+```
+
+Like `SQLDataSource`, every `DataSourceProcessor` implementation must implement the following methods:
+
 
 #### `def __init__(datasource: DataSource))` :
 
@@ -63,11 +106,14 @@ The constructor will be passed the `DataSource` object. You can use the datasour
 You can access the database connection object as follows:
 
 ```python
-config_dict = PostgresConnectionConfiguration().from_dict(
-                self.datasource.config, self.datasource.profile.decrypt_value)
-self._postgres_database_schema = PostgresDatabaseSchema(
-                **config_dict['postgres_config'])
+config_dict = SQLConnectionConfiguration().from_dict(
+    self.datasource.config,
+    self.datasource.profile.decrypt_value,
+)
 
+self._configuration = SQLDatabaseSchema(
+    **config_dict["config"],
+)
 ```
 
 You can intialize you class as required from the connection dictionary as passed above.
