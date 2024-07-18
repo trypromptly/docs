@@ -11,11 +11,7 @@ cd LLMStack/client
 npm install
 npm run build
 cd ..
-pip install poetry
-poetry shell
-poetry install
-pre-commit install
-llmstack
+docker compose -f docker/docker-compose.dev.yml --env-file docker/.env.dev up
 ```
 
 The client will be available at [http://localhost:3000](http://localhost:3000) and the server will be available at [http://localhost:9000](http://localhost:9000).
