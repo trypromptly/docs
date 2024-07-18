@@ -24,6 +24,7 @@ const sidebars = {
         "getting-started/first-app",
       ],
     },
+    "providers",
     {
       type: "category",
       label: "Processors",
