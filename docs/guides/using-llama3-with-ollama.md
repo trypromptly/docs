@@ -18,6 +18,10 @@ In this guide, we will see how to use Ollama with [Promptly](https://trypromptly
 
 For this example, we will run `llama3:latest` model from `Meta` on `Ollama` and use `LLMStack` to build a simple recipe generator application. The application will take a request for recipe from the user and generate a recipe using the llama3 model.
 
+:::tip
+If you want to use `LLMStack` to run everything locally, you can find `LLMStack` installation instructions [here](llmstack/intro.md#installation).
+:::
+
 ## Install Ollama
 
 Follow the instructions at [Ollama](https://github.com/ollama/ollama/) to install Ollama on your machine.
