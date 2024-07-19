@@ -98,6 +98,7 @@ const sidebars = {
       label: "Guides",
       items: [
         "guides/realtime-avatar-with-rag",
+        "guides/using-llama3-with-ollama",
       ],
     },
     {
