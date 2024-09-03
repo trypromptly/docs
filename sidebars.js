@@ -83,9 +83,13 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Jobs",
-      link: { type: "doc", id: "jobs/introduction" },
-      items: [],
+      label: "Sheets",
+      link: { type: "doc", id: "sheets/introduction" },
+      items: [
+        "sheets/types-and-features",
+        "sheets/working-with-sheets",
+        "sheets/advanced-usage",
+      ],
     },
     {
       type: "category",
