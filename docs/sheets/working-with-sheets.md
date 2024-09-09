@@ -18,11 +18,12 @@ Now that we've covered the types and features available in Promptly Sheets, let'
 
 1. Each sheet is creating with a list of default columns. Click on the "+" button to add a new column.
 2. Similar to columns in a spreadsheet, columns can be referred by their column letter (A, B, C, etc.) and rows can be referred by their row number (1, 2, 3, etc.).
-3. When adding a new column, you can choose the column type (Text, Number, URI, Processor_run, App_run, or Data_transformer).
-4. You can also change the column type later by clicking on the icon at the right side of the column header and selecting the type you want.
-5. Configure the column settings based on the type you've chosen.
+3. When adding a new column, you can choose the column type (Text, Number, URI, Boolean, Category, etc).
+4. To populate the column with data using LLMs or by transforming other columns, you can use a formula. Click on the `Populate column with formula` checkbox to add a formula to the column.
+5. You can also change the column type later by clicking on the icon at the right side of the column header and selecting the type you want.
+6. Configure the column settings based on the type you've chosen.
 
-### Configuring a Processor run Column
+### Configuring a Processor run formula
 
 1. Select the provider (OpenAI, Anthropic etc) and the processor you want to use (e.g., Chat Completions, Image Generations etc).
 2. Add the input for the processor. This can be a static value or a reference to other columns in the sheet. You can use `{{ column_letter }}` to reference a column's value in the current row.
@@ -30,13 +31,13 @@ Now that we've covered the types and features available in Promptly Sheets, let'
 4. Configure output template. This can be based on the processor's output schema.
 5. Save the processor run configuration.
 
-### Configuring an App run Column
+### Configuring an App run formula
   
 1. Choose the app or LLM agent you want to use.
 2. Based on the app's input schema, a form will be automatically generated. You can use `{{ column_letter }}` to reference a column's value in the current row and fill in the form.
 3. Save the app run configuration.
 
-### Configuring a Data transformer Column
+### Configuring a Data transformer formula
 
 1. Write your LiquidJS template, referencing other columns as needed.
 2. Save the data transformer configuration.
@@ -63,5 +64,10 @@ In formula cells, you can refer to values in a individual cell by using the cell
 
 1. Once your sheet is configured, click on the green run button in the sheet header to process all cells.
 2. By clicking on the same button, you can pause the running sheet.
+3. You can also run the sheet automatically on a schedule by clicking on the "Automated Runs" option under settings in the sheet header.
+
+:::tip
+You can run only a subset of cells by selecting the cells you want to run and clicking on the run button with your CMD key pressed. You should see tooltip on run button say `Run selected cells`.
+:::
 
 In the next section, we'll cover some advanced usage scenarios and tips for getting the most out of Promptly Sheets.

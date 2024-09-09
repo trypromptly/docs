@@ -9,9 +9,9 @@ You can use sheets to run a large amount of input against LLMs to automate your 
 
 Sheets in Promptly support various data formats and column types, allowing you to create powerful workflows:
 
-- Supports static formats like `text`, `number`, `uri`
-- `processor_run`, `app_run`, and `data_transformer` column types to run agents, apps or LLMs on the data
-- Formula cells for complex operations
+- Supports data formats like `text`, `number`, `uri`, `boolean`, `category` and more
+- Populate columns with data by running LLMs or apps directly on your data with formulas like `processor_run`, `app_run` and `data_transformer`
+- Use formula cells to perform complex operations on your data
 - Ability to spread output across multiple cells
 
 Below is a quick demo of what you can do with sheets. Here we are generating a list of words using `gpt-4o-mini`, expanding them into the column and using those values to generate a short story about them with another call to `gpt-4o-mini` in the second column.
