@@ -14,7 +14,7 @@ Sheets in Promptly support various data formats and column types, allowing you t
 - Use formula cells to perform complex operations on your data
 - Ability to spread output across multiple cells
 
-Below is a quick demo of what you can do with sheets. Here we are generating a list of words using `gpt-4o-mini`, expanding them into the column and using those values to generate a short story about them with another call to `gpt-4o-mini` in the second column.
+Below is a quick demo of what you can do with sheets. Here we are generating searching Apollo for a list of contacts with a certain title, extracting the first name, last name and their linkedin profile url into a sheet. Then we are visiting the linkedin profile url and extracting the persons profile information into the sheet. We then pass this data to GPT-4o to generate a intro message for the person into the sheet. As you can see, we can easily generate a large amount of data and use it for a variety of use cases.
 
 <ReactPlayer
   playing
