@@ -18,4 +18,24 @@ The client will be available at [http://localhost:3000](http://localhost:3000) a
 
 > You can skip running `npm install` and `npm run build` if you have already built the client before
 
-For frontend development, you can use `REACT_APP_API_SERVER=localhost:3000 npm start` to start the development server in client directory. You can also use `npm run build` to build the frontend and serve it from the backend server.
+For frontend development, you can use `REACT_APP_API_SERVER=localhost:3000 npm run start` to start the development server in client directory. You can also use `npm run build` to build the frontend and serve it from the backend server.
+
+## Docker builds
+
+To build the docker image for API server, run the following command from the root of the repo:
+
+```bash
+make api
+```
+
+This will build the client and then the api server docker image. Once the client is build, if you want to make changes to the api server only, you can run the following command:
+
+```bash
+make api-image
+```
+
+To build the docker image for the client app, run the following command:
+
+```bash
+make app
+```
