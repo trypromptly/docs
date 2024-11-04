@@ -35,15 +35,12 @@ The Data Sources page allows you to manage your data sources. You can upload fil
 
 ![Data Sources Page](/img/ui/llmstack-datasources.png)
 
-## Jobs
+## Sheets
 
-Jobs allows you to trigger your apps or agents with a batch of inputs. You can upload a CSV file with inputs and run your apps or agents with each row in the CSV file as input. In the jobs page, you can schedule jobs, view the status of each job and download the outputs from each runs.
+Sheets allows you to process tabular data. You can upload a CSV file, and then use the processors provided by Promptly to process the data.
 
 ![Jobs Page](/img/ui/llmstack-jobs.png)
 
-## Discover
-
-The Discover page allows you to discover new apps. If you are part of an organization, you will see all the apps shared in your organization. If you are not part of an organization, you will see all the public apps.
 
 ## Settings
 

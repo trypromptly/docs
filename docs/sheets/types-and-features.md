@@ -14,6 +14,7 @@ Sheets support these data formats for columns:
 3. **URI**: For storing and working with web addresses and other URIs.
 4. **Boolean**: For storing and working with boolean values.
 5. **Category**: For storing and working with categorical data as a list of comma separated values.
+6. **File**: For storing and working with file data.
 
 <img src="/img/ui/sheet-column-types.png" alt="Column_types" width="300px" />
 
@@ -42,6 +43,10 @@ This formula type enables you to take output from other cells and apply LiquidJS
 Example use case: Combine a customer's name and purchase history into a personalized email template.
 
 <img src="/img/ui/sheet-data-transformer-column-type.png" alt="Data_transformer" width="300px" />
+
+### 4. AI Agent
+
+This formula allows you to call an LLM agent with a set of tools and a prompt. The output of the agent will fill the cell in that column.
 
 ## Formula Cells
 

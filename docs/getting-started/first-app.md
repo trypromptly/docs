@@ -19,7 +19,7 @@ The goal of the app is to generate a story based on a theme provided by the user
 />
 
 1. Login to your [Promptly](https://trypromptly.com) account and click on **Apps** page from the sidebar.
-2. Click on **Web App** tile under "Blank Templates" section.
+2. Click on **Workflow** tile under "Blank Templates" section.
 3. Enter the name of your app, e.g. `Story Generator` and click on **Create App** button.
 4. You will be redirected to the app page with **Editor** tab open.
 5. Modify the **Input** field to take the theme for the story. We will use `theme` as the name of the input field.

@@ -101,6 +101,7 @@ const sidebars = {
       type: "category",
       label: "Guides",
       items: [
+        "guides/no-code-voice-agents",
         "guides/realtime-avatar-with-rag",
         "guides/using-llama3-with-ollama",
       ],
