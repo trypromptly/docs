@@ -135,7 +135,7 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "https://blog.trypromptly.com",
+                to: "https://llmstack.ai/blog",
               },
               {
                 label: "GitHub",
